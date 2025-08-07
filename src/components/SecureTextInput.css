@@ -1,0 +1,243 @@
+Secure Text Input Component Styles
+.secure-text-input-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 1rem 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.secure-input-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.secure-input-label .required {
+  color: #e74c3c;
+  margin-left: 0.25rem;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.secure-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  background: #fff;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.secure-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.secure-input.safe {
+  border-color: #27ae60;
+}
+
+.secure-input.medium-risk {
+  border-color: #f39c12;
+  background-color: #fef9e7;
+}
+
+.secure-input.high-risk {
+  border-color: #e74c3c;
+  background-color: #fdf2f2;
+}
+
+.secure-input.invalid {
+  border-color: #e74c3c;
+  background-color: #fdf2f2;
+}
+
+.secure-input:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.security-indicator {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.security-icon {
+  font-size: 1rem;
+}
+
+.input-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.char-count {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.sanitized-notice {
+  color: #f39c12;
+  font-weight: 500;
+}
+
+.error-message {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background-color: #fdf2f2;
+  border: 1px solid #e74c3c;
+  border-radius: 4px;
+  color: #c0392b;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.security-alerts {
+  margin-top: 1rem;
+}
+
+.security-status {
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 4px solid;
+  font-size: 0.9rem;
+}
+
+.security-status.high-risk {
+  background-color: #fdf2f2;
+  border-left-color: #e74c3c;
+  color: #c0392b;
+}
+
+.security-status.medium-risk {
+  background-color: #fef9e7;
+  border-left-color: #f39c12;
+  color: #d68910;
+}
+
+.threat-item {
+  margin: 0.5rem 0;
+  padding: 0.25rem 0;
+}
+
+.threat-type {
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.threat-description {
+  color: #555;
+}
+
+.sanitized-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+}
+
+.sanitized-preview strong {
+  color: #2c3e50;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.sanitized-text {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  background-color: #fff;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .secure-text-input-container {
+    max-width: 100%;
+  }
+  
+  .secure-input {
+    padding: 0.5rem 2rem 0.5rem 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .security-indicator {
+    width: 1.5rem;
+    height: 1.5rem;
+    right: 0.25rem;
+  }
+  
+  .security-icon {
+    font-size: 0.8rem;
+  }
+  
+  .input-info {
+    font-size: 0.75rem;
+  }
+}
+
+/* Animation for security status changes */
+@keyframes securityAlert {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.security-status.high-risk {
+  animation: securityAlert 0.3s ease-in-out;
+}
+
+/* Focus styles for accessibility */
+.secure-input:focus-visible {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .secure-input {
+    border-width: 3px;
+  }
+  
+  .security-status {
+    border-left-width: 6px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .secure-input,
+  .security-indicator {
+    transition: none;
+  }
+  
+  .security-status.high-risk {
+    animation: none;
+  }
+}
