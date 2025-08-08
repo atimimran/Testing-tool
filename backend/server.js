@@ -963,7 +963,9 @@ const { URL } = require('url');
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.get("/", (req, res) => {
+  res.send("Welcome to the APII!");
+});
 // Browser instance management
 let browserInstance = null;
 
