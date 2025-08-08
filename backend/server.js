@@ -961,6 +961,526 @@
 // const sharp = require('sharp');
 // const axios = require('axios');
 // const { URL } = require('url');
+
+// deep first verdion
+// import express from 'express';
+// import puppeteer from 'puppeteer';
+// import * as chromeLauncher from 'chrome-launcher';
+// import lighthouse from 'lighthouse';
+// import cors from 'cors';
+// import sharp from 'sharp';
+// import axios from 'axios';
+// import { URL } from 'url';
+
+// const app = express();
+// app.use(cors());
+// app.use(express.json());
+// app.get("/", (req, res) => {
+//   res.send("Welcome to the APII!");
+// });
+// // Browser instance management
+// let browserInstance = null;
+
+// const getBrowser = async () => {
+//   if (!browserInstance) {
+//     browserInstance = await puppeteer.launch({
+//       headless: 'new',
+//       args: [
+//         '--no-sandbox',
+//         '--disable-setuid-sandbox',
+//         '--disable-dev-shm-usage',
+//         '--disable-gpu',
+//         '--no-first-run',
+//         '--no-zygote',
+//         '--single-process'
+//       ],
+//       timeout: 60000
+//     });
+//   }
+//   return browserInstance;
+// };
+
+// const releaseBrowser = async () => {
+//   if (browserInstance) {
+//     await browserInstance.close();
+//     browserInstance = null;
+//   }
+// };
+
+// // HTML fetching endpoint
+// app.post('/api/fetch-html', async (req, res) => {
+//   const { url } = req.body;
+//   if (!url) return res.status(400).json({ error: 'Missing URL' });
+
+//   let browser;
+//   try {
+//     browser = await getBrowser();
+//     const page = await browser.newPage();
+//     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
+//     await page.goto(url, { 
+//       waitUntil: 'domcontentloaded', 
+//       timeout: 60000 
+//     });
+    
+//     const html = await page.content();
+//     res.json({ html });
+//   } catch (error) {
+//     console.error('Error fetching HTML:', error);
+//     res.status(500).json({ error: error.message });
+//   } finally {
+//     if (browser) await browser.close();
+//   }
+// });
+
+// // Main analysis endpoint
+// app.post('/api/analyze', async (req, res) => {
+//   const { url } = req.body;
+//   if (!url) return res.status(400).json({ error: 'URL is required' });
+
+//   let page;
+//   try {
+//     // Validate URL
+//     new URL(url);
+    
+//     // Get browser instance
+//     const browser = await getBrowser();
+//     page = await browser.newPage();
+    
+//     // Configure page
+//     await page.setDefaultNavigationTimeout(60000);
+//     await page.setViewport({ width: 1366, height: 768 });
+    
+//     // Navigate to page
+//     const startTime = Date.now();
+//     await page.goto(url, { 
+//       waitUntil: 'networkidle2', 
+//       timeout: 60000 
+//     });
+//     const loadTime = (Date.now() - startTime) / 1000;
+    
+//     // Get rendered HTML
+//     const htmlContent = await page.content();
+    
+//     // Take and compress screenshot
+//     const screenshotBuffer = await page.screenshot({ 
+//       fullPage: true, 
+//       type: 'jpeg', 
+//       quality: 80 
+//     });
+//     const compressedScreenshot = await sharp(screenshotBuffer)
+//       .resize(1200)
+//       .jpeg({ quality: 70 })
+//       .toBuffer();
+    
+//     // Run Lighthouse analysis
+//     const lighthouseResults = await runLighthouseAnalysis(url);
+    
+//     // Test responsiveness
+//     const responsiveness = await testResponsiveness(page);
+    
+//     // Perform security analysis
+//     const securityResults = await performSecurityAnalysis(page, url);
+    
+//     // Perform SEO analysis
+//     const seoResults = await performSEOAnalysis(page);
+    
+//     // Calculate overall score
+//     const overallScore = calculateOverallScore(
+//       loadTime,
+//       responsiveness,
+//       securityResults,
+//       seoResults,
+//       lighthouseResults.performance
+//     );
+    
+//     res.json({
+//       success: true,
+//       url,
+//       timestamp: new Date().toISOString(),
+//       screenshot: `data:image/jpeg;base64,${compressedScreenshot.toString('base64')}`,
+//       performance: {
+//         loadTime,
+//         size: Math.round(htmlContent.length / 1024),
+//         requests: lighthouseResults.requests,
+//         lighthouseScore: lighthouseResults.performance
+//       },
+//       responsiveness,
+//       security: securityResults,
+//       seo: seoResults,
+//       overallScore
+//     });
+
+//   } catch (error) {
+//     console.error('Analysis error:', error);
+//     res.status(500).json({ 
+//       success: false,
+//       error: 'Analysis failed', 
+//       message: error.message
+//     });
+//   } finally {
+//     if (page) await page.close();
+//   }
+// });
+
+// // Run Lighthouse analysis
+// async function runLighthouseAnalysis(url) {
+//   let chrome;
+//   try {
+//     chrome = await chromeLauncher.launch({ 
+//       chromeFlags: ['--headless', '--no-sandbox'] 
+//     });
+    
+//     const options = {
+//       logLevel: 'info',
+//       output: 'json',
+//       onlyCategories: ['performance'],
+//       port: chrome.port
+//     };
+    
+//     // Run Lighthouse
+//     const runnerResult = await lighthouse(url, options);
+//     const lhr = runnerResult.lhr;
+    
+//     return {
+//       performance: Math.round(lhr.categories.performance.score * 100),
+//       requests: lhr.audits['network-requests']?.details?.items?.length || 0
+//     };
+//   } catch (error) {
+//     console.error('Lighthouse analysis failed:', error);
+//     return {
+//       performance: 0,
+//       requests: 0
+//     };
+//   } finally {
+//     if (chrome) await chrome.kill();
+//   }
+// }
+
+// // Responsiveness testing
+// async function testResponsiveness(page) {
+//   const viewports = [
+//     { name: 'mobile', width: 375, height: 667 },
+//     { name: 'tablet', width: 768, height: 1024 },
+//     { name: 'desktop', width: 1366, height: 768 }
+//   ];
+  
+//   const results = {};
+  
+//   for (const viewport of viewports) {
+//     try {
+//       await page.setViewport({ width: viewport.width, height: viewport.height });
+//       await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+//       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+//       const hasHorizontalScroll = await page.evaluate(() => {
+//         return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+//       });
+      
+//       const mediaQueries = await page.evaluate(() => {
+//         const queries = [];
+//         for (const sheet of document.styleSheets) {
+//           try {
+//             for (const rule of sheet.cssRules) {
+//               if (rule.media) {
+//                 queries.push(rule.media.mediaText);
+//               }
+//             }
+//           } catch (e) {}
+//         }
+//         return queries;
+//       });
+      
+//       results[viewport.name] = {
+//         compatible: !hasHorizontalScroll,
+//         issues: hasHorizontalScroll ? ['Horizontal scroll detected'] : [],
+//         mediaQueries: mediaQueries.length
+//       };
+//     } catch (error) {
+//       results[viewport.name] = {
+//         compatible: false,
+//         error: error.message
+//       };
+//     }
+//   }
+  
+//   return results;
+// }
+
+// // Security analysis
+// async function performSecurityAnalysis(page, url) {
+//   try {
+//     // Test XSS vulnerabilities
+//     const xssResults = await testXSSVulnerabilities(page, url);
+    
+//     // Test SQL injection vulnerabilities
+//     const sqlResults = await testSQLInjection(page, url);
+    
+//     // Check security headers
+//     const headers = await checkSecurityHeaders(url);
+    
+//     return {
+//       xss: xssResults,
+//       sqlInjection: sqlResults,
+//       headers: headers
+//     };
+//   } catch (error) {
+//     console.error('Security analysis failed:', error);
+//     return {
+//       xss: { detected: false, tests: [] },
+//       sqlInjection: { detected: false, tests: [] },
+//       headers: { detected: false, missing: [] },
+//       error: 'Security tests failed'
+//     };
+//   }
+// }
+
+// async function testXSSVulnerabilities(page, url) {
+//   const payloads = [
+//     '<script>alert("XSS")</script>',
+//     '<img src=x onerror=alert("XSS")>',
+//     '" onmouseover=alert("XSS")'
+//   ];
+  
+//   const tests = [];
+//   let detected = false;
+  
+//   for (const payload of payloads) {
+//     try {
+//       await page.goto(`${url}?test=${encodeURIComponent(payload)}`, {
+//         waitUntil: 'domcontentloaded',
+//         timeout: 15000
+//       });
+      
+//       const isVulnerable = await page.evaluate((p) => {
+//         return document.body.innerHTML.includes(p);
+//       }, payload);
+      
+//       tests.push({
+//         payload,
+//         vulnerable: isVulnerable,
+//         severity: isVulnerable ? 'high' : 'low'
+//       });
+      
+//       if (isVulnerable) detected = true;
+//     } catch (error) {
+//       tests.push({
+//         payload,
+//         error: error.message
+//       });
+//     }
+//   }
+  
+//   return {
+//     detected,
+//     tests
+//   };
+// }
+
+// async function testSQLInjection(page, url) {
+//   const payloads = [
+//     "' OR '1'='1",
+//     "' UNION SELECT null,version()--",
+//     "'; DROP TABLE users--"
+//   ];
+  
+//   const tests = [];
+//   let detected = false;
+  
+//   for (const payload of payloads) {
+//     try {
+//       await page.goto(`${url}?search=${encodeURIComponent(payload)}`, {
+//         waitUntil: 'domcontentloaded',
+//         timeout: 15000
+//       });
+      
+//       const isVulnerable = await page.evaluate(() => {
+//         return document.body.innerHTML.includes('SQL syntax') ||
+//                document.body.innerHTML.includes('database error');
+//       });
+      
+//       tests.push({
+//         payload,
+//         vulnerable: isVulnerable,
+//         severity: isVulnerable ? 'critical' : 'low'
+//       });
+      
+//       if (isVulnerable) detected = true;
+//     } catch (error) {
+//       tests.push({
+//         payload,
+//         error: error.message
+//       });
+//     }
+//   }
+  
+//   return {
+//     detected,
+//     tests
+//   };
+// }
+
+// async function checkSecurityHeaders(url) {
+//   try {
+//     const response = await axios.head(url, { timeout: 5000 });
+//     const headers = response.headers;
+    
+//     const requiredHeaders = {
+//       'Content-Security-Policy': 'Content Security Policy',
+//       'X-Frame-Options': 'Clickjacking Protection',
+//       'X-Content-Type-Options': 'MIME Sniffing Protection',
+//       'Strict-Transport-Security': 'HSTS'
+//     };
+    
+//     const missing = [];
+//     const present = [];
+    
+//     for (const [header, name] of Object.entries(requiredHeaders)) {
+//       const headerKey = header.toLowerCase();
+//       if (headers[headerKey]) {
+//         present.push(name);
+//       } else {
+//         missing.push(name);
+//       }
+//     }
+    
+//     return {
+//       detected: missing.length > 0,
+//       severity: missing.length > 2 ? 'high' : missing.length > 1 ? 'medium' : 'low',
+//       missing,
+//       present
+//     };
+//   } catch (error) {
+//     return {
+//       detected: true,
+//       error: 'Could not analyze headers',
+//       missing: ['Unable to fetch headers']
+//     };
+//   }
+// }
+
+// // SEO analysis
+// async function performSEOAnalysis(page) {
+//   try {
+//     const result = await page.evaluate(() => {
+//       // Extract title
+//       const title = document.title;
+      
+//       // Extract meta description
+//       const metaDescription = document.querySelector('meta[name="description"]')?.content || '';
+      
+//       // Count headings
+//       const h1Count = document.querySelectorAll('h1').length;
+//       const h2Count = document.querySelectorAll('h2').length;
+      
+//       // Analyze images
+//       const images = document.querySelectorAll('img');
+//       let imagesWithoutAlt = 0;
+      
+//       images.forEach(img => {
+//         if (!img.alt || img.alt.trim() === '') {
+//           imagesWithoutAlt++;
+//         }
+//       });
+      
+//       // Check structured data
+//       const structuredData = document.querySelectorAll('script[type="application/ld+json"]').length;
+      
+//       return {
+//         title,
+//         titleLength: title.length,
+//         metaDescription,
+//         descriptionLength: metaDescription.length,
+//         headings: {
+//           h1Count,
+//           h2Count,
+//           structure: h1Count === 1 ? 'good' : h1Count === 0 ? 'poor' : 'needs improvement'
+//         },
+//         images: {
+//           total: images.length,
+//           withoutAlt: imagesWithoutAlt,
+//           altCoverage: images.length > 0 ? 
+//             ((images.length - imagesWithoutAlt) / images.length * 100) : 100
+//         },
+//         structuredData
+//       };
+//     });
+    
+//     return result;
+//   } catch (error) {
+//     console.error('SEO analysis failed:', error);
+//     return {
+//       title: '',
+//       titleLength: 0,
+//       metaDescription: '',
+//       descriptionLength: 0,
+//       headings: {
+//         h1Count: 0,
+//         h2Count: 0,
+//         structure: 'unknown'
+//       },
+//       images: {
+//         total: 0,
+//         withoutAlt: 0,
+//         altCoverage: 0
+//       },
+//       structuredData: 0,
+//       error: 'SEO analysis failed'
+//     };
+//   }
+// }
+
+// // Calculate overall score
+// function calculateOverallScore(loadTime, responsiveness, security, seo, lighthouseScore) {
+//   let score = 100;
+  
+//   // Performance deductions
+//   if (loadTime > 3) score -= 20;
+//   else if (loadTime > 2) score -= 10;
+  
+//   // Lighthouse score impact
+//   score = score * 0.7 + (lighthouseScore || 0) * 0.3;
+  
+//   // Responsiveness deductions
+//   for (const viewport in responsiveness) {
+//     if (!responsiveness[viewport].compatible) {
+//       score -= 5;
+//     }
+//   }
+  
+//   // Security deductions
+//   if (security.xss?.detected) score -= 15;
+//   if (security.sqlInjection?.detected) score -= 20;
+//   if (security.headers?.detected) {
+//     if (security.headers.severity === 'high') score -= 15;
+//     else if (security.headers.severity === 'medium') score -= 10;
+//     else if (security.headers.severity === 'low') score -= 5;
+//   }
+  
+//   // SEO deductions
+//   if (!seo.title || seo.titleLength === 0) score -= 10;
+//   if (seo.images?.withoutAlt > 0) score -= Math.min(5, seo.images.withoutAlt);
+//   if (seo.structuredData === 0) score -= 5;
+  
+//   return Math.max(0, Math.min(100, Math.round(score)));
+// }
+
+// // Start server
+// const PORT = process.env.PORT || 3001;
+// app.listen(PORT, () => {
+//   console.log(`✅ Backend running on port ${PORT}`);
+//   console.log(`🔍 Health check: http://localhost:${PORT}/health`);
+// });
+
+// // Graceful shutdown
+// process.on('SIGINT', async () => {
+//   await releaseBrowser();
+//   process.exit(0);
+// });
+
+
+
+
 import express from 'express';
 import puppeteer from 'puppeteer';
 import * as chromeLauncher from 'chrome-launcher';
@@ -973,9 +1493,11 @@ import { URL } from 'url';
 const app = express();
 app.use(cors());
 app.use(express.json());
+
 app.get("/", (req, res) => {
   res.send("Welcome to the APII!");
 });
+
 // Browser instance management
 let browserInstance = null;
 
@@ -1033,7 +1555,7 @@ app.post('/api/fetch-html', async (req, res) => {
 
 // Main analysis endpoint
 app.post('/api/analyze', async (req, res) => {
-  const { url } = req.body;
+  const { url, debug = false } = req.body;  // Added debug flag
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
   let page;
@@ -1049,16 +1571,28 @@ app.post('/api/analyze', async (req, res) => {
     await page.setDefaultNavigationTimeout(60000);
     await page.setViewport({ width: 1366, height: 768 });
     
-    // Navigate to page
+    // Navigate to page with extra wait for JS-rendered content
     const startTime = Date.now();
     await page.goto(url, { 
       waitUntil: 'networkidle2', 
       timeout: 60000 
     });
+    // await page.waitForTimeout(3000);  // Additional wait for JS execution
     const loadTime = (Date.now() - startTime) / 1000;
     
     // Get rendered HTML
     const htmlContent = await page.content();
+    
+    // DEBUG: Log meta tags if requested
+    let debugMeta = null;
+    if (debug) {
+      debugMeta = await page.evaluate(() => {
+        return Array.from(document.querySelectorAll('meta')).map(tag => ({
+          name: tag.name || tag.getAttribute('property') || 'N/A',
+          content: tag.content || 'N/A'
+        }));
+      });
+    }
     
     // Take and compress screenshot
     const screenshotBuffer = await page.screenshot({ 
@@ -1106,7 +1640,8 @@ app.post('/api/analyze', async (req, res) => {
       responsiveness,
       security: securityResults,
       seo: seoResults,
-      overallScore
+      overallScore,
+      debug: debug ? { metaTags: debugMeta } : undefined  // Include debug data
     });
 
   } catch (error) {
@@ -1357,15 +1892,41 @@ async function checkSecurityHeaders(url) {
   }
 }
 
-// SEO analysis
+// UPDATED SEO analysis with robust meta description handling
 async function performSEOAnalysis(page) {
   try {
     const result = await page.evaluate(() => {
       // Extract title
       const title = document.title;
       
-      // Extract meta description
-      const metaDescription = document.querySelector('meta[name="description"]')?.content || '';
+      // IMPROVED META DESCRIPTION EXTRACTION
+      const getMetaDescription = () => {
+        // Find all meta tags
+        const metaTags = Array.from(document.querySelectorAll('meta'));
+        
+        // Check standard description tag
+        const standardDesc = metaTags.find(tag => 
+          tag.name && tag.name.toLowerCase() === 'description'
+        );
+        
+        // Check Open Graph description as fallback
+        const ogDesc = metaTags.find(tag => 
+          tag.getAttribute('property') === 'og:description'
+        );
+        
+        // Return the first valid description found
+        return standardDesc?.content || ogDesc?.content || '';
+      };
+      
+      const metaDescription = getMetaDescription();
+      
+      // Unescape HTML entities in description
+      const unescapeHtml = (text) => {
+        const parser = new DOMParser();
+        return parser.parseFromString(text, 'text/html').documentElement.textContent;
+      };
+      
+      const cleanDescription = metaDescription ? unescapeHtml(metaDescription) : '';
       
       // Count headings
       const h1Count = document.querySelectorAll('h1').length;
@@ -1387,8 +1948,8 @@ async function performSEOAnalysis(page) {
       return {
         title,
         titleLength: title.length,
-        metaDescription,
-        descriptionLength: metaDescription.length,
+        metaDescription: cleanDescription,
+        descriptionLength: cleanDescription.length,
         headings: {
           h1Count,
           h2Count,
@@ -1457,6 +2018,7 @@ function calculateOverallScore(loadTime, responsiveness, security, seo, lighthou
   
   // SEO deductions
   if (!seo.title || seo.titleLength === 0) score -= 10;
+  if (seo.descriptionLength === 0) score -= 15;  // Increased penalty for missing description
   if (seo.images?.withoutAlt > 0) score -= Math.min(5, seo.images.withoutAlt);
   if (seo.structuredData === 0) score -= 5;
   
