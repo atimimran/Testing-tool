@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "functions": {
+    "api/server.js": {
+      "runtime": "@vercel/node@1.16.1",
+      "includeFiles": "api/node_modules/lighthouse/shared/localization/locales/**",
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}
