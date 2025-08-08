@@ -949,16 +949,26 @@
 // app.listen(3001, () => console.log('✅ Backend running on http://localhost:3001'));
 
 
-const express = require('express');
-const puppeteer = require('puppeteer');
-const chromeLauncher = require('chrome-launcher');
-// const {lighthouse} = require('lighthouse');
- const lighthouse = require('lighthouse').default;
+// const express = require('express');
+// const puppeteer = require('puppeteer');
+// // const chromeLauncher = require('chrome-launcher');
+// const chromeLauncher = (await import('chrome-launcher')).default;
 
-const cors = require('cors');
-const sharp = require('sharp');
-const axios = require('axios');
-const { URL } = require('url');
+// // const {lighthouse} = require('lighthouse');
+//  const lighthouse = require('lighthouse').default;
+
+// const cors = require('cors');
+// const sharp = require('sharp');
+// const axios = require('axios');
+// const { URL } = require('url');
+import express from 'express';
+import puppeteer from 'puppeteer';
+import * as chromeLauncher from 'chrome-launcher';
+import lighthouse from 'lighthouse';
+import cors from 'cors';
+import sharp from 'sharp';
+import axios from 'axios';
+import { URL } from 'url';
 
 const app = express();
 app.use(cors());
