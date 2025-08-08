@@ -1,14 +1,14 @@
 {
   "version": 2,
   "functions": {
-    "server.js": {
-      "includeFiles": "node_modules/lighthouse/shared/localization/locales/**"
+    "backend/server.js": {
+      "runtime": "@vercel/node@3",
+      "includeFiles": "backend/node_modules/lighthouse/shared/localization/locales/**",
+      "memory": 1024,
+      "maxDuration": 60
     }
   },
-  "builds": [
-    { "src": "server.js", "use": "@vercel/node" }
-  ],
   "routes": [
-    { "src": "/(.*)", "dest": "server.js" }
+    { "src": "/(.*)", "dest": "backend/server.js" }
   ]
 }
